@@ -23,8 +23,11 @@ public class Usuario {
     @NotBlank(message = "A senha é obrigatória")
     private String senha;
 
+    @NotBlank(message = "O telefone é obrigatório")
+    private String telefone;
+
     @ManyToOne
-    @JoinColumn(name = "empresa_id")
+    @JoinColumn(name = "empresa_id", nullable = false)
     private Empresa empresa;
 
     @PrePersist
@@ -33,4 +36,3 @@ public class Usuario {
         this.senha = new BCryptPasswordEncoder().encode(senha);
     }
 }
-
