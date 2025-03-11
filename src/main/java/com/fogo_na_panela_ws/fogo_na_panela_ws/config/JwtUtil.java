@@ -39,6 +39,6 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.get("empresaId", Long.class);  // Extrai empresaId do token
+        return claims.get("empresaId", Long.class);
     }
 }
