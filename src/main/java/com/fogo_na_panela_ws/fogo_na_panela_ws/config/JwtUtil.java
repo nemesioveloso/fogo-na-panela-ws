@@ -23,11 +23,12 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(jwtSecret.getBytes());
     }
 
-    public String gerarToken(Long empresaId, Long usuarioId) {
+    public String gerarToken(Long empresaId, Long usuarioId, String permissao) {
         return Jwts.builder()
                 .setSubject("Autenticacao")
                 .claim("empresaId", empresaId)
                 .claim("usuarioId", usuarioId)
+                .claim("permissao", permissao)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSigningKey(), SignatureAlgorithm.HS512)
