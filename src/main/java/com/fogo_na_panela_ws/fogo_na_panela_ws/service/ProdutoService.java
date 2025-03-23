@@ -5,14 +5,15 @@ import com.fogo_na_panela_ws.fogo_na_panela_ws.model.Empresa;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.model.Produto;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.repository.EmpresaRepository;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.repository.ProdutoRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -22,6 +23,7 @@ public class ProdutoService {
 
     private final ProdutoRepository produtoRepository;
     private final EmpresaRepository empresaRepository;
+    private final LogAcaoService logAcaoService;
 
     public ProdutoResponseDTO salvar(Produto produto, Long empresaId) {
         Empresa empresa = empresaRepository.findById(empresaId)
@@ -48,4 +50,50 @@ public class ProdutoService {
     public Page<Produto> listarPorEmpresaPaginado(Long empresaId, Pageable pageable) {
         return produtoRepository.findAllByEmpresaId(empresaId, pageable);
     }
+
+    @Transactional
+    public Produto atualizar(Long id, Produto novoProduto, Long empresaId, Long usuarioId) {
+        Produto existente = produtoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado."));
+
+        if (!existente.getEmpresa().getId().equals(empresaId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Acesso negado.");
+        }
+
+        String dadosAntigos = existente.toString();
+
+        existente.setNome(novoProduto.getNome());
+        existente.setCategoria(novoProduto.getCategoria());
+        existente.setPrecoCompra(novoProduto.getPrecoCompra());
+        existente.setPrecoVenda(novoProduto.getPrecoVenda());
+        existente.setEstoque(novoProduto.getEstoque());
+        existente.setUltimaAlteracao(LocalDate.now());
+
+        Produto atualizado = produtoRepository.save(existente);
+
+        logAcaoService.registrar(
+                "Produto",
+                "ALTERACAO",
+                "Produto atualizado",
+                dadosAntigos,
+                empresaId,
+                usuarioId // 👈 novo parâmetro adicionado
+        );
+
+        return atualizado;
+    }
+
+    public void deletar(Long id, Long empresaId, Long usuarioId) {
+        Produto produto = produtoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado."));
+
+        if (!produto.getEmpresa().getId().equals(empresaId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não tem permissão para excluir este produto.");
+        }
+
+        produtoRepository.delete(produto);
+        logAcaoService.registrar("Produto", "DELECAO",
+                "Produto removido", produto.toString(), empresaId, usuarioId);
+    }
+
 }

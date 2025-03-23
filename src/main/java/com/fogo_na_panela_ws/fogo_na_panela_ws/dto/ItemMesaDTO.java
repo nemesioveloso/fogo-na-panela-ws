@@ -7,9 +7,9 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class ItemDetalheDTO {
-    private String categoria;
+public class ItemMesaDTO {
     private String nome;
-    private Integer quantidade;
+    private String categoria;
+    private int quantidade;
     private BigDecimal precoUnitario;
 }

@@ -3,6 +3,8 @@ package com.fogo_na_panela_ws.fogo_na_panela_ws.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "itens_comanda")
 @Data
@@ -16,7 +18,7 @@ public class ItemComanda {
 
     private Integer quantidade;
 
-    private Double precoUnitario;
+    private BigDecimal precoUnitario;
 
     @ManyToOne
     @JoinColumn(name = "comanda_id")

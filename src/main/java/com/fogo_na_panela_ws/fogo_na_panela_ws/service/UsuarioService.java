@@ -1,5 +1,6 @@
 package com.fogo_na_panela_ws.fogo_na_panela_ws.service;
 
+import com.fogo_na_panela_ws.fogo_na_panela_ws.dto.ApiResponse;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.enums.Permissao;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.model.Empresa;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.model.Usuario;
@@ -18,6 +19,7 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final EmpresaRepository empresaRepository;
+    private final LogAcaoService logAcaoService;
 
     public Usuario salvar(Usuario usuario, Long empresaId) {
 
@@ -56,6 +58,79 @@ public class UsuarioService {
         return usuarioRepository.findAllByEmpresaId(empresaId, pageable);
     }
 
+    public ApiResponse atualizar(Long id, Usuario atualizado, Long empresaId, Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+
+        if (!usuario.getEmpresa().getId().equals(empresaId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para editar este usuário.");
+        }
+
+        usuarioRepository.findByEmail(atualizado.getEmail())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um e-mail cadastrado.");
+                });
+
+        usuarioRepository.findByTelefone(atualizado.getTelefone())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um telefone cadastrado.");
+                });
+
+        usuarioRepository.findByCpf(atualizado.getCpf())
+                .filter(u -> !u.getId().equals(id))
+                .ifPresent(u -> {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um CPF cadastrado.");
+                });
+
+        // Registro antes da atualização
+        String dadosAntigos = String.format("Nome: %s, Email: %s, Telefone: %s, CPF: %s, Permissão: %s",
+                usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getCpf(), usuario.getPermissao());
+
+        usuario.setNome(atualizado.getNome());
+        usuario.setTelefone(atualizado.getTelefone());
+        usuario.setEmail(atualizado.getEmail());
+        usuario.setCpf(atualizado.getCpf());
+        usuario.setPermissao(atualizado.getPermissao());
+
+        usuarioRepository.save(usuario);
+
+        logAcaoService.registrar(
+                "Usuario",
+                "ATUALIZACAO",
+                "Usuário atualizado",
+                dadosAntigos,
+                empresaId,
+                usuarioId
+        );
+
+        return new ApiResponse("Sucesso", "Usuário atualizado com sucesso.");
+    }
+
+
+    public void deletar(Long id, Long empresaId, Long usuarioId) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado."));
+
+        if (!usuario.getEmpresa().getId().equals(empresaId)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Sem permissão para excluir este usuário.");
+        }
+
+        String dadosAntigos = String.format("Nome: %s, Email: %s, Telefone: %s, CPF: %s, Permissão: %s",
+                usuario.getNome(), usuario.getEmail(), usuario.getTelefone(), usuario.getCpf(), usuario.getPermissao());
+
+        usuarioRepository.delete(usuario);
+
+        logAcaoService.registrar(
+                "Usuario",
+                "DELECAO",
+                "Usuário deletado",
+                dadosAntigos,
+                empresaId,
+                usuarioId
+        );
+    }
 
 
 }

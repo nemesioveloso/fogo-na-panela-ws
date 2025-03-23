@@ -1,5 +1,6 @@
 package com.fogo_na_panela_ws.fogo_na_panela_ws.controller;
 
+import com.fogo_na_panela_ws.fogo_na_panela_ws.dto.ApiResponse;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.dto.ComandaAbertaDTO;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.dto.ItemComandaRequestDTO;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.enums.MetodoPagamento;
@@ -31,10 +32,14 @@ public class ComandaController {
     }
 
     @PatchMapping("/{id}/fechar")
-    public ResponseEntity<Comanda> fechar(@PathVariable Long id, @RequestParam MetodoPagamento metodo) {
-        Comanda comanda = comandaService.fecharComanda(id, metodo);
+    public ResponseEntity<Comanda> fechar(@PathVariable Long id,
+                                          @RequestParam MetodoPagamento metodo,
+                                          HttpServletRequest request) {
+        Long usuarioId = (Long) request.getAttribute("usuarioId"); // 👈 pega do token
+        Comanda comanda = comandaService.fecharComanda(id, metodo, usuarioId);
         return ResponseEntity.ok(comanda);
     }
+
 
     @GetMapping("/abertas")
     public ResponseEntity<List<ComandaAbertaDTO>> listarAbertas(HttpServletRequest request) {
@@ -44,9 +49,9 @@ public class ComandaController {
     }
 
     @PostMapping("/{comandaId}/itens")
-    public ResponseEntity<?> adicionarItem(@PathVariable Long comandaId,
-                                           @RequestBody @Valid ItemComandaRequestDTO dto) {
+    public ResponseEntity<ApiResponse> adicionarItem(@PathVariable Long comandaId,
+                                                     @RequestBody @Valid ItemComandaRequestDTO dto) {
         itemComandaService.adicionarItem(comandaId, dto);
-        return ResponseEntity.status(201).build();
+        return ResponseEntity.status(201).body(new ApiResponse("Sucesso", "Item adicionado com sucesso."));
     }
 }

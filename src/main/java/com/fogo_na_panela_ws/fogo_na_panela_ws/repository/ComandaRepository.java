@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface ComandaRepository extends JpaRepository<Comanda, Long> {
     List<Comanda> findAllByFechadaFalseAndCaixaId(Long caixaId);
+    List<Comanda> findAllByFechadaTrueAndCaixaId(Long caixaId);
 }

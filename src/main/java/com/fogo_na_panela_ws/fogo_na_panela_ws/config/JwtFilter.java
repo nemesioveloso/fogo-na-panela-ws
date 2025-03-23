@@ -1,5 +1,7 @@
 package com.fogo_na_panela_ws.fogo_na_panela_ws.config;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,14 +33,19 @@ public class JwtFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             try {
                 Long empresaId = jwtUtil.obterEmpresaIdDoToken(token);
-                System.out.println("Empresa ID extraído do token: " + empresaId);
-                request.setAttribute("empresaId", empresaId);
+                Long usuarioId = jwtUtil.obterUsuarioIdDoToken(token);
 
-                // Configura o SecurityContext para autenticar a requisição
+                System.out.println("Empresa ID extraído do token: " + empresaId);
+                System.out.println("Usuário ID extraído do token: " + usuarioId);
+
+                request.setAttribute("empresaId", empresaId);
+                request.setAttribute("usuarioId", usuarioId); // 👈 novo
+
+                // Configura o SecurityContext (opcional)
                 UserDetails userDetails = User.builder()
-                        .username(String.valueOf(empresaId))
-                        .password("")  // Senha vazia pois o token já valida
-                        .authorities(Collections.emptyList())  // Sem roles por enquanto
+                        .username(String.valueOf(usuarioId)) // usa o ID do usuário
+                        .password("")
+                        .authorities(Collections.emptyList())
                         .build();
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
@@ -46,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (Exception e) {
-                System.out.println("Erro ao extrair empresaId do token: " + e.getMessage());
+                System.out.println("Erro ao extrair dados do token: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
@@ -54,4 +61,5 @@ public class JwtFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }

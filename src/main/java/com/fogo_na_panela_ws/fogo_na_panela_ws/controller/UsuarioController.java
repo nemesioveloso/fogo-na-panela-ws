@@ -71,4 +71,30 @@ public class UsuarioController {
 
         return ResponseEntity.ok(resposta);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse> atualizarUsuario(@PathVariable Long id,
+                                                        @RequestBody @Valid Usuario usuarioAtualizado,
+                                                        HttpServletRequest request) {
+        try {
+            Long empresaId = (Long) request.getAttribute("empresaId");
+            Long usuarioId = (Long) request.getAttribute("usuarioId");
+            ApiResponse response = usuarioService.atualizar(id, usuarioAtualizado, empresaId, usuarioId);
+            return ResponseEntity.ok(response);
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                    .body(new ApiResponse("Erro", e.getReason()));
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deletarUsuario(@PathVariable Long id,
+                                                      HttpServletRequest request) {
+        Long empresaId = (Long) request.getAttribute("empresaId");
+        Long usuarioId = (Long) request.getAttribute("usuarioId");
+        usuarioService.deletar(id, empresaId, usuarioId);
+        return ResponseEntity.ok(new ApiResponse("Sucesso", "Usuário deletado com sucesso."));
+    }
+
+
 }

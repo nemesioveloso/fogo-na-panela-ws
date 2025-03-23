@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class ItemDetalheDTO {
-    private String categoria;
-    private String nome;
-    private Integer quantidade;
-    private BigDecimal precoUnitario;
+public class DetalheMesaDTO {
+    private String mesa;
+    private List<ItemMesaDTO> itens;
+    private BigDecimal totalMesa;
 }

@@ -3,6 +3,8 @@ package com.fogo_na_panela_ws.fogo_na_panela_ws.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -22,8 +24,8 @@ public class Produto {
     @NotBlank
     private String categoria;
 
-    private Double precoCompra;
-    private Double precoVenda;
+    private BigDecimal precoCompra;
+    private BigDecimal precoVenda;
     private Integer estoque;
 
     private LocalDate adicionado;

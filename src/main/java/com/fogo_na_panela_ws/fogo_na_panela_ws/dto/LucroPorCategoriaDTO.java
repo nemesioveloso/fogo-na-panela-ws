@@ -7,9 +7,7 @@ import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
-public class ItemDetalheDTO {
+public class LucroPorCategoriaDTO {
     private String categoria;
-    private String nome;
-    private Integer quantidade;
-    private BigDecimal precoUnitario;
+    private BigDecimal total;
 }

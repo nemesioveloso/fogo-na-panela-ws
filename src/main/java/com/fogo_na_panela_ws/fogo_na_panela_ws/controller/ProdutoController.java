@@ -65,4 +65,26 @@ public class ProdutoController {
 
         return ResponseEntity.ok(resposta);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse> atualizarProduto(@PathVariable Long id,
+                                                        @Valid @RequestBody Produto produtoAtualizado,
+                                                        HttpServletRequest request) {
+        Long empresaId = (Long) request.getAttribute("empresaId");
+        Long usuarioId = (Long) request.getAttribute("usuarioId");
+
+        produtoService.atualizar(id, produtoAtualizado, empresaId, usuarioId);
+
+        return ResponseEntity.ok(new ApiResponse("Sucesso", String.format("Produto '%s' atualizado com sucesso", produtoAtualizado.getNome())));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse> deletar(@PathVariable Long id, HttpServletRequest request) {
+        Long empresaId = (Long) request.getAttribute("empresaId");
+        Long usuarioId = (Long) request.getAttribute("usuarioId");
+        produtoService.deletar(id, empresaId, usuarioId);
+        return ResponseEntity.ok(new ApiResponse("Sucesso", "Produto deletado com sucesso."));
+    }
+
+
 }
