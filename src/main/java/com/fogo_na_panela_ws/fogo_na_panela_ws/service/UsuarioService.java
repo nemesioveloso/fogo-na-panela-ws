@@ -6,6 +6,8 @@ import com.fogo_na_panela_ws.fogo_na_panela_ws.model.Usuario;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.repository.EmpresaRepository;
 import com.fogo_na_panela_ws.fogo_na_panela_ws.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -49,6 +51,11 @@ public class UsuarioService {
         // Salva o usuário se não houver duplicidade
         return usuarioRepository.save(usuario);
     }
+
+    public Page<Usuario> listarPorEmpresaPaginado(Long empresaId, Pageable pageable) {
+        return usuarioRepository.findAllByEmpresaId(empresaId, pageable);
+    }
+
 
 
 }
