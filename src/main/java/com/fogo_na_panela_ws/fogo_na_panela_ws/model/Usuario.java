@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -35,8 +37,11 @@ public class Usuario {
     @Column(unique = true, length = 11)
     private String cpf;  // Novo campo CPF
 
-    @NotBlank(message = "Senha é obrigatória")
+//    @NotBlank(message = "Senha é obrigatória")
     private String senha;
+
+    @Column(name = "admissao", nullable = false)
+    private LocalDateTime admissao;
 
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
@@ -49,6 +54,9 @@ public class Usuario {
     @PrePersist
     @PreUpdate
     public void criptografarSenha() {
-        this.senha = new BCryptPasswordEncoder().encode(senha);
+        if (senha != null && !senha.startsWith("$2a$")) {
+            this.senha = new BCryptPasswordEncoder().encode(senha);
+        }
     }
+
 }

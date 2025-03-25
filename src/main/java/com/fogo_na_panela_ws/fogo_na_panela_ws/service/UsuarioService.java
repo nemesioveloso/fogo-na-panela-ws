@@ -10,8 +10,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +25,6 @@ public class UsuarioService {
     private final LogAcaoService logAcaoService;
 
     public Usuario salvar(Usuario usuario, Long empresaId) {
-
         // Verifica se a empresa existe
         Empresa empresa = empresaRepository.findById(empresaId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Empresa não encontrada."));
@@ -30,6 +32,10 @@ public class UsuarioService {
         // Verifica duplicidade de Email
         if (usuarioRepository.findByEmail(usuario.getEmail()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um email cadastrado.");
+        }
+
+        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Senha é obrigatória.");
         }
 
         // Verifica duplicidade de Telefone
@@ -46,6 +52,9 @@ public class UsuarioService {
         if (usuario.getPermissao() == null || (!usuario.getPermissao().equals(Permissao.ADMIN) && (!usuario.getPermissao().equals(Permissao.GERENTE)) && !usuario.getPermissao().equals(Permissao.USER))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permissão inválida. Deve ser ADMIN, USER ou GERENTE.");
         }
+
+        // Preenche admissão com a data e hora atual
+        usuario.setAdmissao(LocalDateTime.now());
 
         // Vincula o usuário à empresa encontrada
         usuario.setEmpresa(empresa);
@@ -94,6 +103,11 @@ public class UsuarioService {
         usuario.setCpf(atualizado.getCpf());
         usuario.setPermissao(atualizado.getPermissao());
 
+        // Se uma nova senha for fornecida, atualiza a senha
+        if (atualizado.getSenha() != null && !atualizado.getSenha().isBlank()) {
+            usuario.setSenha(new BCryptPasswordEncoder().encode(atualizado.getSenha()));
+        }
+
         usuarioRepository.save(usuario);
 
         logAcaoService.registrar(
@@ -107,6 +121,7 @@ public class UsuarioService {
 
         return new ApiResponse("Sucesso", "Usuário atualizado com sucesso.");
     }
+
 
 
     public void deletar(Long id, Long empresaId, Long usuarioId) {

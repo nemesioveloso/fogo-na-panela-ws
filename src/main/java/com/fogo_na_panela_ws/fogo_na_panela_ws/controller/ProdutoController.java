@@ -31,7 +31,7 @@ public class ProdutoController {
         Long empresaId = (Long) request.getAttribute("empresaId");
         produtoService.salvar(produto, empresaId);
         return ResponseEntity.status(201)
-                .body(new ApiResponse("Sucesso", String.format("'%s' cadastrado com sucesso", produto.getNome())));
+                .body(new ApiResponse("Sucesso", String.format("%s cadastrado(a) com sucesso", produto.getNome())));
     }
 
     @GetMapping
@@ -75,7 +75,7 @@ public class ProdutoController {
 
         produtoService.atualizar(id, produtoAtualizado, empresaId, usuarioId);
 
-        return ResponseEntity.ok(new ApiResponse("Sucesso", String.format("Produto '%s' atualizado com sucesso", produtoAtualizado.getNome())));
+        return ResponseEntity.ok(new ApiResponse("Sucesso", String.format("%s atualizado(a) com sucesso", produtoAtualizado.getNome())));
     }
 
     @DeleteMapping("/{id}")

@@ -27,5 +27,6 @@ public class LogAcao {
     private LocalDateTime dataHora;
 
     private Long empresaId;
+    @Column(name = "usuario_id", nullable = true)
     private Long usuarioId;
 }

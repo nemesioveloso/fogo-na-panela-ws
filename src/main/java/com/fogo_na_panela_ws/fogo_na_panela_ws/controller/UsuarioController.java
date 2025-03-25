@@ -58,7 +58,8 @@ public class UsuarioController {
                         u.getEmail(),
                         u.getTelefone(),
                         u.getCpf(),
-                        u.getPermissao().name()
+                        u.getPermissao().name(),
+                        u.getAdmissao()
                 )).collect(Collectors.toList());
 
         PaginacaoResponse<UsuarioDTO> resposta = new PaginacaoResponse<>(
