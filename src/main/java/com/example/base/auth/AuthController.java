@@ -1,18 +1,21 @@
 package com.example.base.auth;
 
+import com.example.base.exception.UnauthorizedException;
 import com.example.base.model.User;
 import com.example.base.repository.UserRepository;
 import com.example.base.security.JWTService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -25,25 +28,42 @@ public class AuthController {
     private final UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@Valid @RequestBody LoginRequestDTO request) throws Exception {
+    public ResponseEntity<LoginResponseDTO> login(@Valid @RequestBody LoginRequestDTO request) throws Exception {
         AuthenticationManager authManager = authenticationConfiguration.getAuthenticationManager();
 
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(request.getUsernameOrEmail(), request.getPassword());
+        authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsernameOrEmail(), request.getPassword()
+                )
+        );
 
-        Authentication authentication = authManager.authenticate(authToken);
+        User user = userRepository.findByEmailAndActiveTrue(request.getUsernameOrEmail())
+                .or(() -> userRepository.findByUsernameAndActiveTrue(request.getUsernameOrEmail()))
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado ou inativo."));
 
-        User user = userRepository.findByEmail(request.getUsernameOrEmail())
-                .or(() -> userRepository.findByUsername(request.getUsernameOrEmail()))
-                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado."));
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
 
-        String token = jwtService.generateToken(user);
+        return ResponseEntity.ok(new LoginResponseDTO("Login realizado com sucesso", accessToken, refreshToken));
+    }
 
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Login realizado com sucesso");
-        response.put("token", token);
+    @PostMapping("/refresh")
+    public ResponseEntity<LoginResponseDTO> refresh(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken == null || !jwtService.isValid(refreshToken) || !jwtService.isRefreshToken(refreshToken)) {
+            throw new UnauthorizedException("Refresh token inválido");
+        }
 
-        return ResponseEntity.ok(response);
+        String username = jwtService.extractUsername(refreshToken);
+
+        User user = userRepository.findByUsernameAndActiveTrue(username)
+                .or(() -> userRepository.findByEmailAndActiveTrue(username))
+                .orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado ou inativo."));
+
+        String newAccessToken = jwtService.generateAccessToken(user);
+        String newRefreshToken = jwtService.generateRefreshToken(user);
+
+        return ResponseEntity.ok(new LoginResponseDTO("Token renovado com sucesso", newAccessToken, newRefreshToken));
     }
 }
 

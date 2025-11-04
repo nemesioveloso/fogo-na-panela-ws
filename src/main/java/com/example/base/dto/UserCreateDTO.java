@@ -1,12 +1,10 @@
 package com.example.base.dto;
 
-import com.example.base.enums.Role;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -15,25 +13,23 @@ public class UserCreateDTO {
     @NotBlank
     private String username;
 
-    @Email
     @NotBlank
+    @Email
     private String email;
 
     @NotBlank
+    @Size(min = 6, message = "Senha deve ter pelo menos 6 caracteres")
     private String password;
 
     @NotBlank
     private String fullName;
 
-    @Pattern(regexp = "\\d{11}", message = "CPF inválido")
+    @Pattern(regexp = "\\d{11}|\\d{3}\\.\\d{3}\\.\\d{3}\\-\\d{2}", message = "CPF inválido")
     private String cpf;
 
     private LocalDate birthDate;
-
     private String gender;
-
     private String phone;
-
     private String street;
     private String number;
     private String complement;
@@ -41,8 +37,6 @@ public class UserCreateDTO {
     private String city;
     private String state;
 
-    @Pattern(regexp = "\\d{8}", message = "CEP inválido")
+    @Pattern(regexp = "\\d{8}|\\d{5}\\-\\d{3}", message = "CEP inválido")
     private String zipCode;
-
-    private Set<Role> roles;
 }

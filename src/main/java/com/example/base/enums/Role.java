@@ -2,6 +2,10 @@ package com.example.base.enums;
 
 public enum Role {
     ADMIN,
-    USER,
-    COLLABORATOR
+    CUSTOMER,
+    EMPLOYEE;
+
+    public String asAuthority() {
+        return "ROLE_" + this.name();
+    }
 }

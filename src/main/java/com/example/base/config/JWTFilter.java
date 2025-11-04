@@ -2,19 +2,22 @@ package com.example.base.config;
 
 import com.example.base.repository.UserRepository;
 import com.example.base.security.JWTService;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import com.example.base.model.User;
 
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import java.io.IOException;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JWTFilter extends OncePerRequestFilter {
@@ -36,15 +39,33 @@ public class JWTFilter extends OncePerRequestFilter {
         }
 
         String token = authHeader.substring(7);
-        if (jwtService.isValid(token)) {
-            String username = jwtService.extractUsername(token);
-            User user = userRepository.findByUsername(username).orElse(null);
-            if (user != null) {
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+        if (SecurityContextHolder.getContext().getAuthentication() == null && jwtService.isValid(token)) {
+
+            try {
+                Long userId = jwtService.extractUserId(token);
+
+                userRepository.findById(userId).ifPresent(user -> {
+
+                    if (!user.isActive()) {
+                        SecurityContextHolder.clearContext();
+                        log.warn("Tentativa de uso de token para usuário inativo ID: {}", user.getId());
+                        return;
+                    }
+
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    user,
+                                    null,
+                                    user.getAuthorities()
+                            );
+
+                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                });
+
+            } catch (Exception ex) {
+                log.warn("Token inválido para request {}: {}", request.getRequestURI(), ex.getMessage());
             }
         }
 
