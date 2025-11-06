@@ -42,6 +42,13 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Usuário inativado com sucesso"));
     }
 
+    @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> activate(@PathVariable Long id) {
+        userService.activate(id);
+        return ResponseEntity.ok(Map.of("message", "Usuário reativado com sucesso"));
+    }
+
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody UserCreateDTO dto) {
         User user = userService.create(dto);

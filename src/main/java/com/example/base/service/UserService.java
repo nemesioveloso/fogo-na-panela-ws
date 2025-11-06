@@ -9,5 +9,6 @@ import java.util.Set;
 public interface UserService {
     User create(UserCreateDTO dto);
     void delete(Long id);
+    void activate(Long id);
     User partialUpdate(Long id, UserPatchDTO dto, Long requesterId, Set<Role> roles);
 }

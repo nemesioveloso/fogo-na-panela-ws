@@ -145,5 +145,21 @@ public class UserServiceImpl implements UserService {
 
         log.warn("⚠️ Usuário inativado: {}", user.getUsername());
     }
+
+    @Override
+    public void activate(Long id) {
+        User user = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Usuário não encontrado."));
+
+        if (user.isActive()) {
+            throw new BadRequestException("Usuário já está ativo.");
+        }
+
+        user.setActive(true);
+        repository.save(user);
+
+        log.info("✅ Usuário reativado: {}", user.getUsername());
+    }
+
 }
 
