@@ -65,8 +65,14 @@ public class UserServiceImpl implements UserService {
                 .state(dto.getState())
                 .zipCode(dto.getZipCode())
                 .active(true)
-                .roles(Set.of(Role.CUSTOMER))
                 .build();
+
+        if (repository.count() == 0) {
+            user.setRoles(Set.of(Role.ADMIN));
+            log.warn("🚨 Primeiro usuário do sistema! Definido como ADMIN: {}", username);
+        } else {
+            user.setRoles(Set.of(Role.CUSTOMER));
+        }
 
         log.info("✅ Usuário criado com sucesso: {}", username);
         return repository.save(user);

@@ -36,7 +36,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')") // ✅ agora centralizado em segurança
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Map<String, String>> delete(@PathVariable Long id) {
         userService.delete(id);
         return ResponseEntity.ok(Map.of("message", "Usuário inativado com sucesso"));
@@ -44,9 +44,8 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@Valid @RequestBody UserCreateDTO dto) {
-        User user = userService.create(dto); // ✅ retorno agora é utilizado
+        User user = userService.create(dto);
         log.info("Usuário cadastrado ID: {}", user.getId());
-
         return ResponseEntity.status(201)
                 .body(Map.of("message", "Usuário cadastrado com sucesso"));
     }
