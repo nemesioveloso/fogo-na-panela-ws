@@ -1,6 +1,7 @@
 package com.example.base.model;
 
 import com.example.base.enums.OrderStatus;
+import com.example.base.enums.PaymentMethod;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -24,7 +25,7 @@ public class Order {
     private Long id;
 
     @ManyToOne(optional = false)
-    private User user; // cliente que fez o pedido
+    private User user;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -38,6 +39,10 @@ public class Order {
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal total;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = true) // pode ser null até o admin informar
+    private PaymentMethod paymentMethod;
 
     @PrePersist
     @PreUpdate

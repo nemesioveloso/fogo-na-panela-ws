@@ -1,5 +1,6 @@
 package com.example.base.dto;
 
+import com.example.base.enums.DishCategory;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,9 +15,8 @@ public class DishCreateDTO {
     @Size(max = 100, message = "O nome do prato deve ter no máximo 100 caracteres.")
     private String name;
 
-    @NotBlank(message = "A categoria do prato é obrigatória.")
-    @Size(max = 50, message = "A categoria deve ter no máximo 50 caracteres.")
-    private String category;
+    @NotNull(message = "Categoria é obrigatória.")
+    private DishCategory category;
 
     @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres.")
     private String description;

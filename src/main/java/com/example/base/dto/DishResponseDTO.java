@@ -1,5 +1,6 @@
 package com.example.base.dto;
 
+import com.example.base.enums.DishCategory;
 import com.example.base.model.Dish;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.math.BigDecimal;
 public class DishResponseDTO {
     private Long id;
     private String name;
-    private String category;
+    private DishCategory category;
     private String description;
     private BigDecimal price;
     private boolean active;

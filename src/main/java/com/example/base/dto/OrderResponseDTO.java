@@ -1,6 +1,7 @@
 package com.example.base.dto;
 
 import com.example.base.enums.OrderStatus;
+import com.example.base.enums.PaymentMethod;
 import com.example.base.model.Order;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,8 @@ public class OrderResponseDTO {
     private LocalDateTime createdAt;
     private BigDecimal total;
     private List<OrderItemResponseDTO> items;
+    private PaymentMethod paymentMethod;
+
 
     public static OrderResponseDTO from(Order order) {
         return OrderResponseDTO.builder()
@@ -25,6 +28,7 @@ public class OrderResponseDTO {
                 .createdAt(order.getCreatedAt())
                 .total(order.getTotal())
                 .items(order.getItems().stream().map(OrderItemResponseDTO::from).toList())
+                .paymentMethod(order.getPaymentMethod())
                 .build();
     }
 }

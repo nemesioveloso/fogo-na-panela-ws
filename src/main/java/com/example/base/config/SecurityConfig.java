@@ -40,7 +40,12 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                     .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                     .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()   // ✅ add
+                    .requestMatchers(HttpMethod.POST, "/auth/refresh").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/daily-menu/today").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/daily-menu").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/daily-menu/*").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/dishes").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/dishes/category/*").permitAll()
                     .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
                     .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                     .anyRequest().authenticated()

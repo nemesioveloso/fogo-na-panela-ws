@@ -2,8 +2,11 @@ package com.example.base.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "order_items")
@@ -29,6 +32,13 @@ public class OrderItem {
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal subtotal;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
 
     @PrePersist
     @PreUpdate

@@ -3,7 +3,8 @@ package com.example.base.controller;
 import com.example.base.dto.DishCreateDTO;
 import com.example.base.dto.DishUpdateDTO;
 import com.example.base.dto.DishResponseDTO;
-import com.example.base.model.Dish;
+import com.example.base.enums.DishCategory;
+import com.example.base.exception.BadRequestException;
 import com.example.base.service.DishService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,6 @@ public class DishController {
     }
 
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DishResponseDTO>> listAll() {
         List<DishResponseDTO> dishes = dishService.listAllActive().stream()
                 .map(DishResponseDTO::from)
@@ -61,11 +61,18 @@ public class DishController {
     }
 
     @GetMapping("/category/{category}")
-    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<DishResponseDTO>> listByCategory(@PathVariable String category) {
-        List<DishResponseDTO> dishes = dishService.listByCategory(category).stream()
+        DishCategory categoryEnum;
+        try {
+            categoryEnum = DishCategory.valueOf(category.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Categoria inválida.");
+        }
+
+        List<DishResponseDTO> dishes = dishService.listByCategory(categoryEnum).stream()
                 .map(DishResponseDTO::from)
-                .collect(Collectors.toList());
+                .toList();
+
         return ResponseEntity.ok(dishes);
     }
 
@@ -76,6 +83,13 @@ public class DishController {
                 .map(DishResponseDTO::from)
                 .collect(Collectors.toList());
         log.info("👨‍🍳 Listagem administrativa de pratos: {} itens", dishes.size());
+        return ResponseEntity.ok(dishes);
+    }
+
+    @GetMapping("/admin/all")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public ResponseEntity<List<DishResponseDTO>> listAllAdminFull() {
+        List<DishResponseDTO> dishes = dishService.listAll();
         return ResponseEntity.ok(dishes);
     }
 }

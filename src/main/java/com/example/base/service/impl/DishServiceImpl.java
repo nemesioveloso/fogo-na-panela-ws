@@ -2,6 +2,7 @@ package com.example.base.service.impl;
 
 import com.example.base.dto.DishCreateDTO;
 import com.example.base.dto.DishUpdateDTO;
+import com.example.base.enums.DishCategory;
 import com.example.base.exception.BadRequestException;
 import com.example.base.exception.NotFoundException;
 import com.example.base.model.Dish;
@@ -79,11 +80,11 @@ public class DishServiceImpl implements DishService {
     }
 
     @Override
-    public List<Dish> listByCategory(String category) {
-        if (category == null || category.isBlank()) {
+    public List<Dish> listByCategory(DishCategory category) {
+        if (category == null) {
             throw new BadRequestException("Categoria não pode ser vazia.");
         }
-        return dishRepository.findByCategoryIgnoreCaseAndActiveTrue(category.trim());
+        return dishRepository.findByCategoryAndActiveTrue(category);
     }
 
     @Override

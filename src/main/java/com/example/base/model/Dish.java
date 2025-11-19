@@ -1,10 +1,14 @@
 package com.example.base.model;
 
 
+import com.example.base.enums.DishCategory;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "dishes")
@@ -22,8 +26,9 @@ public class Dish {
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private String category;
+    private DishCategory category;
 
     @Column(length = 255)
     private String description;
@@ -33,4 +38,11 @@ public class Dish {
 
     @Column(nullable = false)
     private boolean active = true;
+
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
+
 }

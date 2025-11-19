@@ -1,5 +1,7 @@
 package com.example.base.dto;
 
+import com.example.base.enums.DishCategory;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -14,8 +16,7 @@ public class DishUpdateDTO {
     @Size(max = 100, message = "O nome do prato deve ter no máximo 100 caracteres.")
     private String name;
 
-    @Size(max = 50, message = "A categoria deve ter no máximo 50 caracteres.")
-    private String category;
+    private DishCategory category;
 
     @Size(max = 255, message = "A descrição deve ter no máximo 255 caracteres.")
     private String description;

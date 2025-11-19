@@ -2,6 +2,7 @@ package com.example.base.service.impl;
 
 import com.example.base.dto.*;
 import com.example.base.enums.OrderStatus;
+import com.example.base.enums.PaymentMethod;
 import com.example.base.exception.BadRequestException;
 import com.example.base.exception.NotFoundException;
 import com.example.base.model.*;
@@ -75,11 +76,62 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponseDTO> listAll() {
-        throw new UnsupportedOperationException("Funcionalidade disponível apenas para ADMIN/EMPLOYEE.");
+        return orderRepository.findAll().stream()
+                .map(OrderResponseDTO::from)
+                .toList();
     }
 
     @Override
-    public OrderResponseDTO updateStatus(Long orderId, String status) {
-        throw new UnsupportedOperationException("Funcionalidade disponível apenas para ADMIN/EMPLOYEE.");
+    @Transactional
+    public OrderResponseDTO updateStatus(Long orderId, String statusStr) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Pedido não encontrado."));
+
+        OrderStatus newStatus;
+        try {
+            newStatus = OrderStatus.valueOf(statusStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Status inválido: " + statusStr);
+        }
+
+        validateStatusTransition(order.getStatus(), newStatus);
+
+        order.setStatus(newStatus);
+        orderRepository.save(order);
+
+        return OrderResponseDTO.from(order);
+    }
+
+    @Override
+    @Transactional
+    public OrderResponseDTO setPaymentMethod(Long orderId, PaymentMethod method) {
+
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new NotFoundException("Pedido não encontrado."));
+
+        if (order.getStatus() == OrderStatus.CANCELED) {
+            throw new BadRequestException("Não é possível registrar pagamento para um pedido cancelado.");
+        }
+
+        order.setPaymentMethod(method);
+        orderRepository.save(order);
+
+        return OrderResponseDTO.from(order);
+    }
+
+
+    private void validateStatusTransition(OrderStatus oldStatus, OrderStatus newStatus) {
+        boolean valid = switch (oldStatus) {
+            case PENDING -> (newStatus == OrderStatus.CONFIRMED || newStatus == OrderStatus.CANCELED);
+            case CONFIRMED -> newStatus == OrderStatus.PREPARING;
+            case PREPARING -> newStatus == OrderStatus.READY;
+            case READY -> newStatus == OrderStatus.OUT_FOR_DELIVERY;
+            case OUT_FOR_DELIVERY -> newStatus == OrderStatus.DELIVERED;
+            default -> false;
+        };
+
+        if (!valid) {
+            throw new BadRequestException("Transição inválida: " + oldStatus + " → " + newStatus);
+        }
     }
 }
