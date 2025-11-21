@@ -6,6 +6,7 @@ import com.example.base.service.CardapioDiarioService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.DayOfWeek;
@@ -19,6 +20,7 @@ public class CardapioDiarioController {
     private final CardapioDiarioService cardapioService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<CardapioDiarioResponseDTO> criar(
             @Valid @RequestBody CardapioDiarioCreateDTO dto) {
         return ResponseEntity.status(201).body(cardapioService.criar(dto));
@@ -26,12 +28,19 @@ public class CardapioDiarioController {
 
     @GetMapping
     public ResponseEntity<List<CardapioDiarioResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(cardapioService.listarTodos());
+        return ResponseEntity.ok(cardapioService.listarTodosAtivos());
     }
 
     @GetMapping("/{dia}")
     public ResponseEntity<CardapioDiarioResponseDTO> buscarPorDia(@PathVariable String dia) {
-        DayOfWeek diaEnum = DayOfWeek.valueOf(dia.toUpperCase());
+
+        DayOfWeek diaEnum;
+        try {
+            diaEnum = DayOfWeek.valueOf(dia.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new com.example.base.exception.BadRequestException("Dia inválido. Use MONDAY, TUESDAY, etc.");
+        }
+
         return ResponseEntity.ok(cardapioService.buscarPorDia(diaEnum));
     }
 

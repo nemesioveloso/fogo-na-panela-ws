@@ -9,6 +9,6 @@ import java.util.List;
 public interface CardapioDiarioService {
     CardapioDiarioResponseDTO criar(CardapioDiarioCreateDTO dto);
     CardapioDiarioResponseDTO buscarPorDia(DayOfWeek dia);
-    List<CardapioDiarioResponseDTO> listarTodos();
+    List<CardapioDiarioResponseDTO> listarTodosAtivos();
     CardapioDiarioResponseDTO buscarCardapioDeHoje();
 }

@@ -24,5 +24,6 @@ public class CardapioDiario {
     @ManyToMany
     private Set<Item> itens = new HashSet<>();
 
+    @Column(nullable = false)
     private boolean ativo = true;
 }

@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ItemService {
     ItemResponseDTO criar(ItemCreateDTO dto);
-    List<ItemResponseDTO> listarTodos();
+    List<ItemResponseDTO> listarTodosAtivos();
     List<ItemResponseDTO> listarPorCategoria(Long categoriaId);
+    ItemResponseDTO atualizar(Long id, ItemCreateDTO dto);
+    void inativar(Long id);
 }

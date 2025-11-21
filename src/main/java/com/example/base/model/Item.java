@@ -19,4 +19,7 @@ public class Item {
 
     @ManyToOne(optional = false)
     private Categoria categoria;
+
+    @Column(nullable = false)
+    private boolean ativo = true;
 }

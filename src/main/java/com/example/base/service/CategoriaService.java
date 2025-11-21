@@ -7,5 +7,7 @@ import java.util.List;
 
 public interface CategoriaService {
     CategoriaResponseDTO criar(CategoriaCreateDTO dto);
-    List<CategoriaResponseDTO> listarTodas();
+    List<CategoriaResponseDTO> listarTodasAtivas();
+    CategoriaResponseDTO atualizar(Long id, CategoriaCreateDTO dto);
+    void inativar(Long id);
 }

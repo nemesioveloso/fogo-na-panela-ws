@@ -3,6 +3,7 @@ package com.example.base.service.impl;
 import com.example.base.dto.CardapioDiarioCreateDTO;
 import com.example.base.dto.CardapioDiarioResponseDTO;
 import com.example.base.exception.BadRequestException;
+import com.example.base.exception.ConflictException;
 import com.example.base.exception.NotFoundException;
 import com.example.base.model.CardapioDiario;
 import com.example.base.model.Item;
@@ -27,8 +28,8 @@ public class CardapioDiarioServiceImpl implements CardapioDiarioService {
     @Override
     public CardapioDiarioResponseDTO criar(CardapioDiarioCreateDTO dto) {
 
-        if (cardapioRepository.existsByDiaSemana(dto.getDiaSemana())) {
-            throw new BadRequestException("Já existe um cardápio cadastrado para este dia.");
+        if (cardapioRepository.existsByDiaSemanaAndAtivoTrue(dto.getDiaSemana())) {
+            throw new ConflictException("Já existe um cardápio ativo para este dia.");
         }
 
         var itens = new HashSet<>(itemRepository.findAllById(dto.getItensIds()));
@@ -50,15 +51,15 @@ public class CardapioDiarioServiceImpl implements CardapioDiarioService {
 
     @Override
     public CardapioDiarioResponseDTO buscarPorDia(DayOfWeek dia) {
-        CardapioDiario cardapio = cardapioRepository.findByDiaSemana(dia)
+        CardapioDiario cardapio = cardapioRepository.findByDiaSemanaAndAtivoTrue(dia)
                 .orElseThrow(() -> new NotFoundException("Cardápio não encontrado para este dia."));
 
         return CardapioDiarioResponseDTO.from(cardapio);
     }
 
     @Override
-    public List<CardapioDiarioResponseDTO> listarTodos() {
-        return cardapioRepository.findAll()
+    public List<CardapioDiarioResponseDTO> listarTodosAtivos() {
+        return cardapioRepository.findByAtivoTrue()
                 .stream()
                 .map(CardapioDiarioResponseDTO::from)
                 .toList();
@@ -68,7 +69,7 @@ public class CardapioDiarioServiceImpl implements CardapioDiarioService {
     public CardapioDiarioResponseDTO buscarCardapioDeHoje() {
         DayOfWeek hoje = LocalDate.now().getDayOfWeek();
 
-        CardapioDiario cardapio = cardapioRepository.findByDiaSemana(hoje)
+        CardapioDiario cardapio = cardapioRepository.findByDiaSemanaAndAtivoTrue(hoje)
                 .orElseThrow(() -> new NotFoundException("Cardápio de hoje não foi definido."));
 
         return CardapioDiarioResponseDTO.from(cardapio);

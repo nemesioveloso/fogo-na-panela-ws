@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
     boolean existsByNomeIgnoreCase(String nome);
-
-    List<Item> findByCategoriaId(Long categoriaId);
+    List<Item> findByAtivoTrue();
+    List<Item> findByCategoriaIdAndAtivoTrue(Long categoriaId);
 }
