@@ -95,4 +95,17 @@ public class ItemServiceImpl implements ItemService {
         item.setAtivo(false);
         itemRepository.save(item);
     }
+
+    @Override
+    public void reativar(Long id) {
+        Item item = itemRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Item não encontrado."));
+
+        if (item.isAtivo()) {
+            throw new ConflictException("Este item já está ativo.");
+        }
+
+        item.setAtivo(true);
+        itemRepository.save(item);
+    }
 }

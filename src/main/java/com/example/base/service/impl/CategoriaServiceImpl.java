@@ -8,6 +8,7 @@ import com.example.base.exception.NotFoundException;
 import com.example.base.model.Categoria;
 import com.example.base.repository.CategoriaRepository;
 import com.example.base.service.CategoriaService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,7 @@ public class CategoriaServiceImpl implements CategoriaService {
     private final CategoriaRepository categoriaRepository;
 
     @Override
-    public CategoriaResponseDTO criar(CategoriaCreateDTO dto) {
+    public void criar(CategoriaCreateDTO dto) {
 
         if (categoriaRepository.existsByNomeIgnoreCase(dto.getNome())) {
             throw new ConflictException("Já existe uma categoria com este nome.");
@@ -32,8 +33,6 @@ public class CategoriaServiceImpl implements CategoriaService {
                 .build();
 
         categoriaRepository.save(categoria);
-
-        return CategoriaResponseDTO.from(categoria);
     }
 
     @Override
@@ -70,4 +69,19 @@ public class CategoriaServiceImpl implements CategoriaService {
         categoria.setAtivo(false);
         categoriaRepository.save(categoria);
     }
+
+    @Override
+    @Transactional
+    public void reativar(Long id) {
+        Categoria categoria = categoriaRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Categoria não encontrada."));
+
+        if (categoria.isAtivo()) {
+            throw new BadRequestException("A categoria já está ativa.");
+        }
+
+        categoria.setAtivo(true);
+        categoriaRepository.save(categoria);
+    }
+
 }

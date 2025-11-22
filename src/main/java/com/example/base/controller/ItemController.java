@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/itens")
@@ -49,4 +50,12 @@ public class ItemController {
         itemService.inativar(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/reativar")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public ResponseEntity<Map<String, String>> reativar(@PathVariable Long id) {
+        itemService.reativar(id);
+        return ResponseEntity.ok(Map.of("message", "Item reativado com sucesso!"));
+    }
+
 }

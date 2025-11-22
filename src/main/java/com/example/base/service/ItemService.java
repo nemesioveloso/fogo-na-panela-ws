@@ -11,4 +11,5 @@ public interface ItemService {
     List<ItemResponseDTO> listarPorCategoria(Long categoriaId);
     ItemResponseDTO atualizar(Long id, ItemCreateDTO dto);
     void inativar(Long id);
+    void reativar(Long id);
 }

@@ -2,6 +2,8 @@ package com.example.base.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.Fetch;
 
 import java.time.DayOfWeek;
 import java.util.HashSet;
@@ -22,6 +24,7 @@ public class CardapioDiario {
     private DayOfWeek diaSemana;
 
     @ManyToMany
+    @Fetch(FetchMode.JOIN)
     private Set<Item> itens = new HashSet<>();
 
     @Column(nullable = false)
