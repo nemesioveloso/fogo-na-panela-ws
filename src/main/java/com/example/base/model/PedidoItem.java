@@ -15,10 +15,13 @@ public class PedidoItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Quentinhas quentinha;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     private Pedido pedido;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Item item;
 
     private int quantidade;

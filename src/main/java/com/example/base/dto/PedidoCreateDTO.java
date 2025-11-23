@@ -1,10 +1,13 @@
 package com.example.base.dto;
 
-import jakarta.validation.constraints.NotEmpty;
+import com.example.base.enums.TipoEntrega;
+import com.example.base.enums.MetodoPagamento;
 
 import java.util.List;
 
 public record PedidoCreateDTO(
-        @NotEmpty(message = "A lista de itens não pode ser vazia.")
-        List<ItemPedidoDTO> itens
+        List<QuentinhasDTO> quentinhas,
+        List<ItemPedidoDTO> bebidas,
+        TipoEntrega tipoEntrega,
+        MetodoPagamento metodoPagamento
 ) {}

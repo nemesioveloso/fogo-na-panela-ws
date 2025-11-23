@@ -68,5 +68,12 @@ public class PedidoController {
     public ResponseEntity<PedidoResponseDTO> avancarStatus(@PathVariable Long id) {
         return ResponseEntity.ok(pedidoService.avancarStatus(id));
     }
+
+    @GetMapping("/admin")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
+    public ResponseEntity<List<PedidoResponseDTO>> listarTodos() {
+        return ResponseEntity.ok(pedidoService.listarTodos());
+    }
+
 }
 

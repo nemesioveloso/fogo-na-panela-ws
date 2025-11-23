@@ -12,5 +12,5 @@ public interface PedidoService {
     PedidoResponseDTO refazer(Long id, Long usuarioId);
     List<PedidoResponseDTO> listarParaCozinha();
     PedidoResponseDTO avancarStatus(Long id);
-
+    List<PedidoResponseDTO> listarTodos();
 }
