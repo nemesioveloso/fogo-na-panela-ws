@@ -2,6 +2,7 @@ package com.example.base.controller;
 
 import com.example.base.dto.ComposicaoQuentinhaCreateDTO;
 import com.example.base.dto.ComposicaoQuentinhaResponseDTO;
+import com.example.base.dto.ComposicaoQuentinhaUpdateDTO;
 import com.example.base.service.ComposicaoQuentinhaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +38,7 @@ public class ComposicaoQuentinhaController {
     public ResponseEntity<ComposicaoQuentinhaResponseDTO> atualizar(
             @PathVariable Long tipoId,
             @PathVariable Long composicaoId,
-            @Valid @RequestBody ComposicaoQuentinhaCreateDTO dto) {
+            @Valid @RequestBody ComposicaoQuentinhaUpdateDTO dto) {
 
         return ResponseEntity.ok(service.atualizar(tipoId, composicaoId, dto));
     }

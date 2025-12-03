@@ -35,6 +35,8 @@ public class ItemServiceImpl implements ItemService {
         Item item = Item.builder()
                 .nome(dto.getNome())
                 .categoria(categoria)
+                .preco(dto.getPreco())
+                .extraTipo(dto.getExtraTipo())
                 .ativo(true)
                 .build();
 
@@ -79,6 +81,8 @@ public class ItemServiceImpl implements ItemService {
 
         item.setNome(dto.getNome());
         item.setCategoria(categoria);
+        item.setPreco(dto.getPreco());
+        item.setExtraTipo(dto.getExtraTipo());
 
         itemRepository.save(item);
 

@@ -11,12 +11,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -33,7 +28,8 @@ public class AuthController {
 
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsernameOrEmail(), request.getPassword()
+                        request.getUsernameOrEmail(),
+                        request.getPassword()
                 )
         );
 
@@ -44,13 +40,22 @@ public class AuthController {
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        return ResponseEntity.ok(new LoginResponseDTO("Login realizado com sucesso", accessToken, refreshToken));
+        return ResponseEntity.ok(new LoginResponseDTO(
+                "Login realizado com sucesso",
+                accessToken,
+                refreshToken
+        ));
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<LoginResponseDTO> refresh(@RequestBody Map<String, String> body) {
-        String refreshToken = body.get("refreshToken");
-        if (refreshToken == null || !jwtService.isValid(refreshToken) || !jwtService.isRefreshToken(refreshToken)) {
+    public ResponseEntity<LoginResponseDTO> refresh(
+            @Valid @RequestBody RefreshTokenRequestDTO dto) {
+
+        String refreshToken = dto.getRefreshToken();
+
+        if (refreshToken == null
+                || !jwtService.isValid(refreshToken)
+                || !jwtService.isRefreshToken(refreshToken)) {
             throw new UnauthorizedException("Refresh token inválido");
         }
 
@@ -63,7 +68,10 @@ public class AuthController {
         String newAccessToken = jwtService.generateAccessToken(user);
         String newRefreshToken = jwtService.generateRefreshToken(user);
 
-        return ResponseEntity.ok(new LoginResponseDTO("Token renovado com sucesso", newAccessToken, newRefreshToken));
+        return ResponseEntity.ok(new LoginResponseDTO(
+                "Token renovado com sucesso",
+                newAccessToken,
+                newRefreshToken
+        ));
     }
 }
-

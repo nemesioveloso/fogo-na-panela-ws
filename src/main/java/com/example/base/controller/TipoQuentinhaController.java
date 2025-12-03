@@ -1,8 +1,10 @@
 package com.example.base.controller;
 
+import com.example.base.dto.TipoQuentinhaCreateDTO;
 import com.example.base.dto.TipoQuentinhaDTO;
 import com.example.base.dto.TipoQuentinhaUpdateDTO;
 import com.example.base.service.TipoQuentinhaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +22,7 @@ public class TipoQuentinhaController {
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<TipoQuentinhaDTO> criar(
-            @RequestBody TipoQuentinhaUpdateDTO dto) {
+            @Valid @RequestBody TipoQuentinhaCreateDTO dto) {
 
         return ResponseEntity.status(201).body(service.criar(dto));
     }

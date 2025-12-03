@@ -1,5 +1,6 @@
 package com.example.base.service.impl;
 
+import com.example.base.dto.TipoQuentinhaCreateDTO;
 import com.example.base.dto.TipoQuentinhaDTO;
 import com.example.base.dto.TipoQuentinhaUpdateDTO;
 import com.example.base.exception.NotFoundException;
@@ -20,14 +21,14 @@ public class TipoQuentinhaServiceImpl implements TipoQuentinhaService {
 
     @Override
     @Transactional
-    public TipoQuentinhaDTO criar(TipoQuentinhaUpdateDTO dto) {
+    public TipoQuentinhaDTO criar(TipoQuentinhaCreateDTO dto) {
 
         TipoQuentinha tipo = TipoQuentinha.builder()
                 .nome(dto.nome())
                 .qtdCarnesInclusas(dto.qtdCarnesInclusas())
                 .precoBase(dto.precoBase())
                 .precoCarneExtra(dto.precoCarneExtra())
-                .ativo(dto.ativo() != null ? dto.ativo() : true)
+                .ativo(true)
                 .build();
 
         repository.save(tipo);
