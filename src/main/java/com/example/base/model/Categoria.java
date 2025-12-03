@@ -1,5 +1,6 @@
 package com.example.base.model;
 
+import com.example.base.enums.TipoItem;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +17,9 @@ public class Categoria {
 
     @Column(nullable = false, unique = true)
     private String nome;
+
+    @Enumerated(EnumType.STRING)
+    private TipoItem tipo;
 
     @Column(nullable = false)
     private boolean ativo = true;

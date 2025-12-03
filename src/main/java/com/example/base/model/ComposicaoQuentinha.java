@@ -1,33 +1,32 @@
 package com.example.base.model;
 
-import com.example.base.enums.ExtraTipo;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Item {
+public class ComposicaoQuentinha {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String nome;
-
-    private BigDecimal preco;
+    @ManyToOne(optional = false)
+    private TipoQuentinha tipoQuentinha;
 
     @ManyToOne(optional = false)
     private Categoria categoria;
 
-    @Enumerated(EnumType.STRING)
-    private ExtraTipo extraTipo;
+    @Column(nullable = false)
+    private int quantidadeObrigatoria;
 
     @Column(nullable = false)
-    private boolean ativo = true;
+    private int quantidadeInclusa;
+
+    @Column(nullable = false)
+    private boolean contabilizaComoCarneExtra;
 }

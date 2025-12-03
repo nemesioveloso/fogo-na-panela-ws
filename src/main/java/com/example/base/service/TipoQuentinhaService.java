@@ -1,9 +1,7 @@
 package com.example.base.service;
 
-import com.example.base.dto.TipoQuentinhaCreateDTO;
 import com.example.base.dto.TipoQuentinhaDTO;
 import com.example.base.dto.TipoQuentinhaUpdateDTO;
-import com.example.base.dto.TipoQuentinhaResponseDTO;
 
 import java.util.List;
 

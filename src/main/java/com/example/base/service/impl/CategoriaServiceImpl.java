@@ -29,6 +29,7 @@ public class CategoriaServiceImpl implements CategoriaService {
 
         Categoria categoria = Categoria.builder()
                 .nome(dto.getNome())
+                .tipo(dto.getTipo())
                 .ativo(true)
                 .build();
 
@@ -54,6 +55,8 @@ public class CategoriaServiceImpl implements CategoriaService {
         }
 
         categoria.setNome(dto.getNome());
+        categoria.setTipo(dto.getTipo());
+
         categoriaRepository.save(categoria);
 
         return CategoriaResponseDTO.from(categoria);
